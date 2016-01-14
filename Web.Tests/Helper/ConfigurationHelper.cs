@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace Web.Tests
 
         public static string ChromeDrive
         {
-            get { return ConfigurationManager.AppSettings["ChromeDrive"]; }
+            get { return string.Format("{0}{1}", FolderPath, ConfigurationManager.AppSettings["ChromeDrive"]); }
         }
 
         public static string TestUserName
@@ -37,6 +38,16 @@ namespace Web.Tests
         public static string TestPassword
         {
             get { return ConfigurationManager.AppSettings["TestPassword"]; }
+        }
+
+        public static string FolderPath
+        {
+            get { return Path.GetDirectoryName(Path.GetDirectoryName(System.IO.Directory.GetCurrentDirectory())); }
+        }
+
+        public static string FolderPicture
+        {
+            get { return string.Format("{0}{1}", FolderPath, ConfigurationManager.AppSettings["FolderPicture"]); }
         }
     }
 }
