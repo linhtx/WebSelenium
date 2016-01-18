@@ -49,5 +49,16 @@ namespace Web.Tests
         {
             get { return string.Format("{0}{1}", FolderPath, ConfigurationManager.AppSettings["FolderPicture"]); }
         }
+
+        public static int BrowserType
+        {
+            get { return Convert.ToInt32(ConfigurationManager.AppSettings["BrowserType"]); }
+        }
+    }
+
+    public enum BrowserType
+    {
+        Chrome = 1,
+        Firefox = 2
     }
 }

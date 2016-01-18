@@ -10,46 +10,48 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium;
 using System.Drawing.Imaging;
 using System.IO;
+using OpenQA.Selenium.Firefox;
 
 namespace Web.Tests.Controllers
 {
     [TestClass]
     public class HomeControllerTest
     {
-        ChromeDriver chromeDrive;
+        private IWebDriver webDriver;
 
         [TestInitialize]
         public void Setup()
         {
-            chromeDrive = new ChromeDriver(ConfigurationHelper.ChromeDrive);
-
+            if (ConfigurationHelper.BrowserType == (int)BrowserType.Firefox)
+            {
+                webDriver = new FirefoxDriver();
+            }
+            else
+            {
+                webDriver = new ChromeDriver(ConfigurationHelper.ChromeDrive);
+            }
             bool exists = System.IO.Directory.Exists(ConfigurationHelper.FolderPicture);
+
             if (!exists)
             {
                 System.IO.Directory.CreateDirectory(ConfigurationHelper.FolderPicture);
-            }   
+            }
         }
 
         [TestMethod]
         public void RegisterSuccess()
-        {   
-            chromeDrive.Navigate().GoToUrl(ConfigurationHelper.RegisterUrl);
-            var txtUserName = chromeDrive.FindElementById("UserName");
-            var txtPassword = chromeDrive.FindElementById("Password");
-            var txtConfirmPassword = chromeDrive.FindElementById("ConfirmPassword");
-            var btnRegister = chromeDrive.FindElementById("Register");
-
-            txtUserName.SendKeys(ConfigurationHelper.TestUserName);
-            txtPassword.SendKeys(ConfigurationHelper.TestPassword);
-            txtConfirmPassword.SendKeys(ConfigurationHelper.TestPassword);
-
-            btnRegister.Submit();
-
-            Screenshot screenshot = ((ITakesScreenshot)chromeDrive).GetScreenshot();
+        {
+            webDriver.Navigate().GoToUrl(ConfigurationHelper.RegisterUrl);
+            webDriver.FindElement(By.Id("UserName")).SendKeys(ConfigurationHelper.TestUserName);
+            webDriver.FindElement(By.Id("Password")).SendKeys(ConfigurationHelper.TestPassword);
+            webDriver.FindElement(By.Id("ConfirmPassword")).SendKeys(ConfigurationHelper.TestPassword);
+            webDriver.FindElement(By.Id("Register")).Submit();
+            Screenshot screenshot = ((ITakesScreenshot)webDriver).GetScreenshot();
             bool result = true;
+
             try
             {
-                var errMessage = chromeDrive.FindElementByClassName("validation-summary-errors");
+                var errMessage = webDriver.FindElement(By.ClassName("validation-summary-errors"));
                 result = !errMessage.Displayed;
                 SaveScreenshot(screenshot, string.Format("{0}_register_fail.png", ConfigurationHelper.TestUserName));
             }
@@ -61,25 +63,19 @@ namespace Web.Tests.Controllers
             Assert.AreEqual(result, true);
         }
 
-
         [TestMethod]
         public void LoginSuccess()
         {
-            chromeDrive.Navigate().GoToUrl(ConfigurationHelper.LoginUrl);
-            var txtUserName = chromeDrive.FindElementById("UserName");
-            var txtPassword = chromeDrive.FindElementById("Password");
-            var btnLogin = chromeDrive.FindElementById("Login");
-
-            txtUserName.SendKeys(ConfigurationHelper.TestUserName);
-            txtPassword.SendKeys(ConfigurationHelper.TestPassword);
-
-            btnLogin.Submit();
-
-            Screenshot screenshot = ((ITakesScreenshot)chromeDrive).GetScreenshot();
+            webDriver.Navigate().GoToUrl(ConfigurationHelper.LoginUrl);
+            webDriver.FindElement(By.Id("UserName")).SendKeys(ConfigurationHelper.TestUserName);
+            webDriver.FindElement(By.Id("Password")).SendKeys(ConfigurationHelper.TestPassword);
+            webDriver.FindElement(By.Id("Login")).Submit();
+            Screenshot screenshot = ((ITakesScreenshot)webDriver).GetScreenshot();
             bool result = true;
+
             try
             {
-                var errMessage = chromeDrive.FindElementByClassName("validation-summary-errors");
+                var errMessage = webDriver.FindElement(By.ClassName("validation-summary-errors"));
                 result = !errMessage.Displayed;
                 SaveScreenshot(screenshot, string.Format("{0}_login_fail.png", ConfigurationHelper.TestUserName));
             }
@@ -94,21 +90,16 @@ namespace Web.Tests.Controllers
         [TestMethod]
         public void LoginFailureInvalid()
         {
-            chromeDrive.Navigate().GoToUrl(ConfigurationHelper.LoginUrl);
-            var txtUserName = chromeDrive.FindElementById("UserName");
-            var txtPassword = chromeDrive.FindElementById("Password");
-            var btnLogin = chromeDrive.FindElementById("Login");
-
-            txtUserName.SendKeys(Guid.NewGuid().ToString());
-            txtPassword.SendKeys(Guid.NewGuid().ToString());
-
-            btnLogin.Submit();
-
-            Screenshot screenshot = ((ITakesScreenshot)chromeDrive).GetScreenshot();
+            webDriver.Navigate().GoToUrl(ConfigurationHelper.LoginUrl);
+            webDriver.FindElement(By.Id("UserName")).SendKeys(Guid.NewGuid().ToString());
+            webDriver.FindElement(By.Id("Password")).SendKeys(Guid.NewGuid().ToString());
+            webDriver.FindElement(By.Id("Login")).Submit();
+            Screenshot screenshot = ((ITakesScreenshot)webDriver).GetScreenshot();
             bool result = false;
+
             try
             {
-                var errMessage = chromeDrive.FindElementByClassName("validation-summary-errors");
+                var errMessage = webDriver.FindElement(By.ClassName("validation-summary-errors"));
                 result = errMessage.Text.Equals("Invalid username or password.");
 
                 SaveScreenshot(screenshot, string.Format("{0}_login_fail.png", ConfigurationHelper.TestUserName));
@@ -124,23 +115,17 @@ namespace Web.Tests.Controllers
         [TestMethod]
         public void RegisterFailure()
         {
-            chromeDrive.Navigate().GoToUrl(ConfigurationHelper.RegisterUrl);
-            var txtUserName = chromeDrive.FindElementById("UserName");
-            var txtPassword = chromeDrive.FindElementById("Password");
-            var txtConfirmPassword = chromeDrive.FindElementById("ConfirmPassword");
-            var btnRegister = chromeDrive.FindElementById("Register");
-
-            txtUserName.SendKeys(ConfigurationHelper.TestUserName);
-            txtPassword.SendKeys(ConfigurationHelper.TestPassword);
-            txtConfirmPassword.SendKeys(ConfigurationHelper.TestPassword);
-
-            btnRegister.Submit();
-
-            Screenshot screenshot = ((ITakesScreenshot)chromeDrive).GetScreenshot();
+            webDriver.Navigate().GoToUrl(ConfigurationHelper.RegisterUrl);
+            webDriver.FindElement(By.Id("UserName")).SendKeys(ConfigurationHelper.TestUserName);
+            webDriver.FindElement(By.Id("Password")).SendKeys(ConfigurationHelper.TestPassword);
+            webDriver.FindElement(By.Id("ConfirmPassword")).SendKeys(ConfigurationHelper.TestPassword);
+            webDriver.FindElement(By.Id("Register")).Submit();
+            Screenshot screenshot = ((ITakesScreenshot)webDriver).GetScreenshot();
             bool result = false;
+
             try
             {
-                var errMessage = chromeDrive.FindElementByClassName("validation-summary-errors");
+                var errMessage = webDriver.FindElement(By.ClassName("validation-summary-errors"));
                 result = errMessage.Displayed;
                 SaveScreenshot(screenshot, string.Format("{0}_register_fail.png", ConfigurationHelper.TestUserName));
             }
@@ -155,20 +140,15 @@ namespace Web.Tests.Controllers
         [TestMethod]
         public void LoginFailure()
         {
-            chromeDrive.Navigate().GoToUrl(ConfigurationHelper.LoginUrl);
-            var txtUserName = chromeDrive.FindElementById("UserName");
-            var txtPassword = chromeDrive.FindElementById("Password");
-            var btnLogin = chromeDrive.FindElementById("Login");
-
-            txtUserName.SendKeys(Guid.NewGuid().ToString());
-            txtPassword.SendKeys(Guid.NewGuid().ToString());
-
-            btnLogin.Submit();
-
+            webDriver.Navigate().GoToUrl(ConfigurationHelper.LoginUrl);
+            webDriver.FindElement(By.Id("UserName")).SendKeys(Guid.NewGuid().ToString());
+            webDriver.FindElement(By.Id("Password")).SendKeys(Guid.NewGuid().ToString());
+            webDriver.FindElement(By.Id("Login")).Submit();
             bool result = false;
+
             try
             {
-                var errMessage = chromeDrive.FindElementByClassName("validation-summary-errors");
+                var errMessage = webDriver.FindElement(By.ClassName("validation-summary-errors"));
                 result = errMessage.Displayed;
             }
             catch
@@ -181,7 +161,7 @@ namespace Web.Tests.Controllers
 
         private void SaveScreenshot(Screenshot screenshot, string fileName)
         {
-            screenshot.SaveAsFile(string.Format("{0}{1}", ConfigurationHelper.FolderPicture, fileName), ImageFormat.Png); 
+            screenshot.SaveAsFile(string.Format("{0}{1}", ConfigurationHelper.FolderPicture, fileName), ImageFormat.Png);
         }
     }
 }
